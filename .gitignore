@@ -3,3 +3,7 @@ __pycache__/
 *.pyc
 .env
 .streamlit/
+
+# allow models & assets
+!models/
+!assets/
