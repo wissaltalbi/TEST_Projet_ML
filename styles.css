@@ -1103,7 +1103,7 @@ div[data-testid="metric-container"]:hover {
 
 @media (max-width: 768px) {
     .block-container { padding: 1rem !important; }
-    [data-testid=\"stSidebar\"] { width: 0 !important; }
+    /* Sidebar accessible via hamburger menu on mobile */
     h1 { font-size: 1.75rem !important; }
     h2 { font-size: 1.4rem !important; }
     h3 { font-size: 1.15rem !important; }
@@ -1119,4 +1119,5 @@ div[data-testid="metric-container"]:hover {
     h1 { font-size: 1.5rem !important; }
     [data-testid=\"stMetricValue\"] { font-size: 1.75rem !important; }
 }
+
 
