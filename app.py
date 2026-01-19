@@ -21,9 +21,28 @@ logger = logging.getLogger(__name__)
 # Page configuration
 st.set_page_config(
     page_title="SmartCoach Pro",
+    page_icon="💪",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="auto",  # Auto-collapse on mobile
+    menu_items={
+        'Get Help': 'https://github.com/your-repo',
+        'Report a bug': "https://github.com/your-repo/issues",
+        'About': "SmartCoach Pro - AI Fitness Tracking with ML"
+    }
 )
+
+# PWA Meta Tags for Mobile Installation
+st.markdown("""
+<link rel="manifest" href="/app/static/manifest.json">
+<meta name="theme-color" content="#6366f1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SmartCoach">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
+<meta name="description" content="Application de fitness intelligente avec détection automatique d'exercices par IA">
+""", unsafe_allow_html=True)
+
 
 
 @st.cache_data
