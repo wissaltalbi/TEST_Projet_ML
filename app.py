@@ -560,6 +560,24 @@ def main():
     # Initialize session state
     init_session_state()
     
+    # 🆕 CRITICAL: Initialize database on first run (for Streamlit Cloud)
+    try:
+        from backend.database import init_db, engine, Base
+        from backend import models
+        from sqlalchemy import inspect
+        
+        # Check if tables exist
+        inspector = inspect(engine)
+        existing_tables = inspector.get_table_names()
+        
+        if not existing_tables or 'users' not in existing_tables:
+            logger.info("🔄 Database tables not found, initializing...")
+            init_db()
+            logger.info("✅ Database initialized successfully")
+    except Exception as e:
+        logger.error(f"⚠️ Database initialization error: {e}")
+        # Continue anyway, will show error on first use
+    
     # Initialize predefined programs (only runs once if DB is empty)
     try:
         from src.workout_programs import init_predefined_programs
@@ -570,6 +588,15 @@ def main():
         logger.error(f"Error initializing programs: {e}")
         import traceback
         logger.error(traceback.format_exc())
+    
+    # Initialize achievements (only runs once if DB is empty)
+    try:
+        from src.gamification import init_achievements
+        logger.info("Attempting to initialize achievements...")
+        init_achievements()
+        logger.info("Achievements initialization completed")
+    except Exception as e:
+        logger.error(f"Error initializing achievements: {e}")
     
     # Route based on authentication status
     if st.session_state.user_id is None:
