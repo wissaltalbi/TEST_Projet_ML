@@ -8,15 +8,6 @@ from src.workout_programs import get_all_programs, enroll_user_in_program, get_u
 from src.design_system import COLORS
 
 
-def set_background(img_b64):
-    """Set page background image"""
-    if img_b64:
-        st.markdown(
-            f"""<div class='bg-overlay' style='background-image: url(data:image/png;base64,{img_b64})'></div>""",
-            unsafe_allow_html=True
-        )
-
-
 def get_difficulty_color(difficulty: str) -> str:
     """Get color based on difficulty level"""
     difficulty_colors = {
@@ -30,7 +21,7 @@ def get_difficulty_color(difficulty: str) -> str:
 
 def programs_page(background_b64=None):
     """Render the professional training programs page"""
-    set_background(background_b64)
+    # Background is now set by main_app(), no need to set it here
     
     # ==========================================
     # HERO SECTION
@@ -149,70 +140,99 @@ def programs_page(background_b64=None):
             program = filtered_programs[idx]
             
             with col:
+                # Program Card Container
+                st.markdown(f"""
+                <div style='
+                    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05));
+                    border: 1px solid rgba(99, 102, 241, 0.2);
+                    border-radius: 1rem;
+                    padding: 1.5rem;
+                    margin-bottom: 1rem;
+                '>
+                """, unsafe_allow_html=True)
+                
                 # Program header
                 col_title, col_badge = st.columns([3, 1])
                 
                 with col_title:
-                    st.markdown(f"**{program['name']}**")
+                    st.markdown(f"### {program['name']}")
                 
                 with col_badge:
                     difficulty_color = get_difficulty_color(program['difficulty'])
                     st.markdown(f"""
-                    <div style='text-align: right;'>
+                    <div style='text-align: right; margin-top: 0.5rem;'>
                         <span style='
                             display: inline-block;
-                            background: {difficulty_color}20;
+                            background: {difficulty_color}30;
                             color: {difficulty_color};
-                            padding: 0.25rem 0.75rem;
+                            padding: 0.4rem 1rem;
                             border-radius: 999px;
-                            font-size: 0.7rem;
+                            font-size: 0.75rem;
                             font-weight: 700;
                             text-transform: uppercase;
+                            border: 1px solid {difficulty_color}50;
                         '>{program['difficulty']}</span>
                     </div>
                     """, unsafe_allow_html=True)
                 
                 # Description
-                st.caption(program['description'])
+                st.markdown(f"<p style='color: rgba(255,255,255,0.7); margin: 1rem 0;'>{program['description']}</p>", unsafe_allow_html=True)
                 
                 # Details
                 detail_col1, detail_col2 = st.columns(2)
                 with detail_col1:
-                    st.caption(f"⏱️ {program['duration_weeks']} weeks")
+                    st.markdown(f"<p style='color: rgba(255,255,255,0.6);'>⏱️ <strong>{program['duration_weeks']} weeks</strong></p>", unsafe_allow_html=True)
                 with detail_col2:
-                    st.caption(f"📊 {program['difficulty'].title()}")
+                    st.markdown(f"<p style='color: rgba(255,255,255,0.6);'>📊 <strong>{program['difficulty'].title()}</strong></p>", unsafe_allow_html=True)
                 
-                st.markdown("")
+                st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
                 
                 # Enrollment button
                 is_active = active_program and active_program['program_id'] == program['id']
                 
                 if is_active:
-                    st.success("Currently Enrolled")
+                    st.success(" Currently Enrolled")
                 else:
                     if st.button(
                         "Enroll in Program",
                         key=f"enroll_{program['id']}",
-                        use_container_width=True
+                        use_container_width=True,
+                        type="primary"
                     ):
                         enroll_user_in_program(st.session_state.user_id, program['id'])
                         st.success(f"Successfully enrolled in {program['name']}!")
                         st.rerun()
                 
-                st.divider()
+                st.markdown("</div>", unsafe_allow_html=True)
+    
+    st.markdown("<div style='height: 2rem;'></div>", unsafe_allow_html=True)
     
     # ==========================================
     # INFORMATION SECTION
     # ==========================================
-    st.markdown("### About Training Programs")
+    st.markdown("###  About Training Programs")
     
-    st.write("""
-    Training programs provide structured workout plans to help you achieve specific fitness goals:
-    
-    - **Beginner**: Perfect for those just starting their fitness journey
-    - **Intermediate**: For those with some experience looking to level up
-    - **Advanced**: Challenging programs for experienced athletes
-    - **Expert**: Elite-level training for maximum performance
-    
-    Each program guides you day-by-day with recommended exercises, target reps, and progressive difficulty.
-    """)
+    st.markdown("""
+    <div style='
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05));
+        border-left: 4px solid #6366f1;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        margin-top: 1rem;
+    '>
+        <p style='color: rgba(255,255,255,0.85); line-height: 1.8; margin: 0;'>
+            Training programs provide structured workout plans to help you achieve specific fitness goals:
+        </p>
+        <br>
+        <ul style='color: rgba(255,255,255,0.85); line-height: 2;'>
+            <li><strong style='color: #10b981;'>Beginner</strong>: Perfect for those just starting their fitness journey</li>
+            <li><strong style='color: #f59e0b;'>Intermediate</strong>: For those with some experience looking to level up</li>
+            <li><strong style='color: #ef4444;'>Advanced</strong>: Challenging programs for experienced athletes</li>
+            <li><strong style='color: #ec4899;'>Expert</strong>: Elite-level training for maximum performance</li>
+        </ul>
+        <br>
+        <p style='color: rgba(255,255,255,0.7); margin: 0; font-style: italic;'>
+            Each program guides you day-by-day with recommended exercises, target reps, and progressive difficulty.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)

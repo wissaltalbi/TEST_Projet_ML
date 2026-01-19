@@ -137,6 +137,26 @@ EXERCISES = {
         'calories_per_second': 0.1,
         'target_duration': (30, 60),
         'color': '#f59e0b'
+    },
+    'bench': {
+        'name': 'Bench Press',
+        'icon': '🏋️',
+        'description': 'Développe les pectoraux, triceps et épaules',
+        'muscle_groups': ['Pectoraux', 'Triceps', 'Épaules'],
+        'difficulty': 'Intermédiaire',
+        'calories_per_rep': 0.7,
+        'target_reps': (8, 12),
+        'color': '#f59e0b'
+    },
+    'deadlift': {
+        'name': 'Deadlift',
+        'icon': '💪',
+        'description': 'Exercice complet pour le dos et les jambes',
+        'muscle_groups': ['Dos', 'Ischio-jambiers', 'Fessiers'],
+        'difficulty': 'Avancé',
+        'calories_per_rep': 0.8,
+        'target_reps': (5, 10),
+        'color': '#ef4444'
     }
 }
 

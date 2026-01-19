@@ -165,7 +165,7 @@ def dashboard_page(background_b64=None):
     with col2:
         if st.button("Browse Programs", use_container_width=True, key="browse_programs"):
             st.session_state.page = 'programs'
-            st.rerun()
+            st.rerun() 
     
     with col3:
         if st.button("View History", use_container_width=True, key="view_history"):

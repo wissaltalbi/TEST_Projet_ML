@@ -1,6 +1,6 @@
 # SmartCoach Pro - Professional Fitness Application
 # Refactored with modular architecture and external CSS
-# Updated: 2026-01-04 - Login Page Redesign
+# Updated: Login Page Redesign with Logo Card
 
 import streamlit as st
 import base64
@@ -45,6 +45,7 @@ LOGIN_BG = get_img_b64('assets/login_bg_premium.png')
 DASH_BG = get_img_b64('assets/dashboard_background_pro_1767472546043.png')
 WORKOUT_BG = get_img_b64('assets/workout_background_pro_1767472562531.png')
 ACH_BG = get_img_b64('assets/achievements_background_pro_1767472580234.png')
+LOGO = get_img_b64('assets/logo.png')
 
 
 def load_css_content():
@@ -109,7 +110,8 @@ def init_session_state():
         'page': 'dashboard',
         'classifier': None,
         'workout_started': False,
-        'session_token': session_token
+        'session_token': session_token,
+        'auth_mode': 'signin'  # 'signin' or 'signup'
     }
     
     for key, value in defaults.items():
@@ -118,61 +120,126 @@ def init_session_state():
 
 
 def set_background(img_b64: str):
-    """Set page background image"""
+    """Set page background image - simple and stable approach"""
     if img_b64:
         st.markdown(
-            f"""<div class='bg-overlay' style='background-image: url(data:image/png;base64,{img_b64})'></div>""",
+            f"""
+            <style>
+            /* Simple fixed background */
+            .stApp {{
+                background-image: url(data:image/png;base64,{img_b64}) !important;
+                background-size: cover !important;
+                background-position: center !important;
+                background-repeat: no-repeat !important;
+                background-attachment: fixed !important;
+            }}
+            
+            /* Dark overlay */
+            .stApp > div:first-child {{
+                background: linear-gradient(135deg, rgba(10, 14, 26, 0.85) 0%, rgba(26, 31, 53, 0.80) 100%) !important;
+            }}
+            </style>
+            """,
             unsafe_allow_html=True
         )
 
 
 def login_page():
-    """Render ultra-modern professional login page"""
+    """Render login page with unified card design using CSS"""
     set_background(LOGIN_BG)
     
-    # Create centered layout with professional card
-    col1, col2, col3 = st.columns([1.2, 2, 1.2])
+    # Get current mode from session state
+    auth_mode = st.session_state.get('auth_mode', 'signin')
+    
+    # Add custom CSS for unified login card
+    st.markdown("""
+    <style>
+    /* Force main container to be visible */
+    .main, .block-container {
+        position: relative !important;
+        z-index: 100 !important;
+    }
+    
+    /* Unified Login Card */
+    .block-container {
+        padding-top: 3rem !important;
+    }
+    
+    /* Target all columns to ensure visibility */
+    div[data-testid="column"] {
+        position: relative !important;
+        z-index: 100 !important;
+    }
+    
+    /* Create unified card wrapper */
+    div[data-testid="column"]:nth-of-type(2) {
+        background: rgba(15, 23, 42, 0.95) !important;
+        backdrop-filter: blur(20px) !important;
+        border-radius: 1.5rem !important;
+        padding: 3rem 3rem 2.5rem 3rem !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+        border: 1px solid rgba(99, 102, 241, 0.2) !important;
+    }
+    
+    /* Remove form borders to blend in */
+    div[data-testid="column"]:nth-of-type(2) [data-testid="stForm"] {
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+    }
+    
+    /* Style buttons inside card */
+    div[data-testid="column"]:nth-of-type(2) .stButton > button {
+        margin-top: 0 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Create centered layout
+    col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
-        # Premium Brand Header
-        st.markdown("""
-        <div class='login-container'>
-            <div class='brand-header'>
-                <h1 class='brand-title'>SmartCoach Pro</h1>
-                <p class='brand-subtitle'>AI-Powered Athletic Training</p>
-            </div>
+        # Logo and header
+        st.markdown(f"""
+        <div style='text-align: center; margin-bottom: 2.5rem;'>
+            <img src='data:image/png;base64,{LOGO}' style='
+                max-width: 200px;
+                height: auto;
+                margin-bottom: 1.5rem;
+            ' />
+            <h2 style='
+                font-size: 2rem;
+                font-weight: 700;
+                color: #ffffff;
+                margin: 0 0 0.5rem 0;
+            '>{'Welcome Back' if auth_mode == 'signin' else 'Create Account'}</h2>
+            <p style='
+                color: rgba(255,255,255,0.6);
+                font-size: 1rem;
+                margin: 0;
+            '>{'Sign in to continue your fitness journey' if auth_mode == 'signin' else 'Join SmartCoach Pro and start training smarter'}</p>
+        </div>
         """, unsafe_allow_html=True)
         
-        # Modern Tabs with enhanced styling
-        tab1, tab2 = st.tabs(["Sign In", "Create Account"])
-        
-        with tab1:
-            st.markdown("""
-            <div class='form-section'>
-                <h2 class='form-title'>Welcome Back</h2>
-                <p class='form-description'>Sign in to continue your fitness journey</p>
-            </div>
-            """, unsafe_allow_html=True)
-            
+        # Sign In Form
+        if auth_mode == 'signin':
             with st.form("login_form", clear_on_submit=False):
-                st.markdown("<div class='input-group'>", unsafe_allow_html=True)
                 username = st.text_input(
                     "Username or Email",
                     placeholder="Enter your username or email",
-                    key="login_username"
+                    key="login_username",
+                    label_visibility="collapsed"
                 )
-                st.markdown("</div>", unsafe_allow_html=True)
                 
-                st.markdown("<div class='input-group'>", unsafe_allow_html=True)
                 password = st.text_input(
                     "Password",
                     type="password",
                     placeholder="Enter your password",
-                    key="login_password"
+                    key="login_password",
+                    label_visibility="collapsed"
                 )
-                st.markdown("</div>", unsafe_allow_html=True)
                 
-                st.markdown("<div style='height: 2rem'></div>", unsafe_allow_html=True)
+                st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
                 
                 submitted = st.form_submit_button(
                     "Sign In",
@@ -184,7 +251,6 @@ def login_page():
                     if username and password:
                         success, message, user = login_user(username, password)
                         if success:
-                            # Create session token
                             session_mgr = get_session_manager()
                             token = session_mgr.create_session(user.id)
                             
@@ -195,49 +261,61 @@ def login_page():
                                 'session_token': token
                             })
                             
-                            # Add token to URL for persistence
                             st.query_params['session'] = token
-                            
                             st.success("Login successful! Welcome back!")
                             st.rerun()
                         else:
                             st.error(message)
                     else:
                         st.warning("Please enter both username and password")
-        
-        with tab2:
+            
+            # Switch to Sign Up
+            st.markdown("<div style='height: 1.5rem'></div>", unsafe_allow_html=True)
             st.markdown("""
-            <div class='form-section'>
-                <h2 class='form-title'>Create Your Account</h2>
-                <p class='form-description'>Join SmartCoach Pro and start training smarter</p>
+            <div style='text-align: center;'>
+                <p style='color: rgba(255,255,255,0.6); font-size: 0.95rem; margin-bottom: 1rem;'>
+                    Don't have an account?
+                </p>
             </div>
             """, unsafe_allow_html=True)
             
+            if st.button("Create Account", use_container_width=True, key="switch_to_signup"):
+                st.session_state.auth_mode = 'signup'
+                st.rerun()
+            
+            # Footer
+            st.markdown("""
+            <div style='text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1);'>
+                <p style='color: rgba(255,255,255,0.4); font-size: 0.85rem; margin: 0;'>
+                    Powered by Advanced AI Technology
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Sign Up Form
+        else:
             with st.form("register_form", clear_on_submit=False):
-                st.markdown("<div class='input-group'>", unsafe_allow_html=True)
                 new_username = st.text_input(
                     "Username",
                     placeholder="Choose a unique username",
-                    key="register_username"
+                    key="register_username",
+                    label_visibility="collapsed"
                 )
-                st.markdown("</div>", unsafe_allow_html=True)
                 
-                st.markdown("<div class='input-group'>", unsafe_allow_html=True)
                 new_email = st.text_input(
                     "Email",
                     placeholder="your.email@example.com",
-                    key="register_email"
+                    key="register_email",
+                    label_visibility="collapsed"
                 )
-                st.markdown("</div>", unsafe_allow_html=True)
                 
-                st.markdown("<div class='input-group'>", unsafe_allow_html=True)
                 new_password = st.text_input(
                     "Password",
                     type="password",
                     placeholder="Create a strong password (min. 8 characters)",
-                    key="register_password"
+                    key="register_password",
+                    label_visibility="collapsed"
                 )
-                st.markdown("</div>", unsafe_allow_html=True)
                 
                 # Password strength indicator
                 if new_password:
@@ -251,7 +329,7 @@ def login_page():
                     width = (strength_score + 1) * 20
                     
                     st.markdown(f"""
-                    <div style="margin-bottom: 1.5rem;">
+                    <div style="margin-bottom: 1rem;">
                         <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 999px; overflow: hidden; margin-bottom: 0.5rem;">
                             <div style="width: {width}%; height: 100%; background: {color}; transition: all 0.3s ease; border-radius: 999px;"></div>
                         </div>
@@ -261,16 +339,15 @@ def login_page():
                     </div>
                     """, unsafe_allow_html=True)
                 
-                st.markdown("<div class='input-group'>", unsafe_allow_html=True)
                 confirm_password = st.text_input(
                     "Confirm Password",
                     type="password",
                     placeholder="Re-enter your password",
-                    key="register_confirm"
+                    key="register_confirm",
+                    label_visibility="collapsed"
                 )
-                st.markdown("</div>", unsafe_allow_html=True)
                 
-                st.markdown("<div style='height: 2rem'></div>", unsafe_allow_html=True)
+                st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
                 
                 submitted = st.form_submit_button(
                     "Create Account",
@@ -286,20 +363,38 @@ def login_page():
                             success, message, _ = register_user(new_username, new_email, new_password)
                             if success:
                                 st.success(f"{message}")
-                                st.info("Please go to the 'Sign In' tab to login with your credentials")
+                                st.info("Please sign in with your credentials")
+                                import time
+                                time.sleep(2)
+                                st.session_state.auth_mode = 'signin'
+                                st.rerun()
                             else:
                                 st.error(message)
                     else:
                         st.warning("Please fill in all fields")
-        
-        # Professional Footer
-        st.markdown("""
-            <div class='login-footer'>
-                <p>Powered by Advanced AI Technology</p>
+            
+            # Switch to Sign In
+            st.markdown("<div style='height: 1.5rem'></div>", unsafe_allow_html=True)
+            st.markdown("""
+            <div style='text-align: center;'>
+                <p style='color: rgba(255,255,255,0.6); font-size: 0.95rem; margin-bottom: 1rem;'>
+                    Already have an account?
+                </p>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
-
+            """, unsafe_allow_html=True)
+            
+            if st.button("Sign In", use_container_width=True, key="switch_to_signin"):
+                st.session_state.auth_mode = 'signin'
+                st.rerun()
+            
+            # Footer
+            st.markdown("""
+            <div style='text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1);'>
+                <p style='color: rgba(255,255,255,0.4); font-size: 0.85rem; margin: 0;'>
+                    Powered by Advanced AI Technology
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
 
 
 def render_sidebar():
@@ -414,21 +509,27 @@ def main_app():
     """Main application with navigation"""
     render_sidebar()
     
-    # Route to appropriate page
+    # Route to appropriate page with backgrounds
     page = st.session_state.get('page', 'dashboard')
     
     if page == 'dashboard':
+        set_background(DASH_BG)
         dashboard_page(DASH_BG)
     elif page == 'workout':
+        set_background(WORKOUT_BG)
         workout_page(WORKOUT_BG)
     elif page == 'programs':
+        set_background(DASH_BG)
         programs_page(DASH_BG)
     elif page == 'achievements':
+        set_background(ACH_BG)
         achievements_page(ACH_BG)
     elif page == 'history':
+        set_background(DASH_BG)
         history_page(DASH_BG)
     else:
         # Default to dashboard
+        set_background(DASH_BG)
         dashboard_page(DASH_BG)
 
 
@@ -439,6 +540,17 @@ def main():
     
     # Initialize session state
     init_session_state()
+    
+    # Initialize predefined programs (only runs once if DB is empty)
+    try:
+        from src.workout_programs import init_predefined_programs
+        logger.info("Attempting to initialize programs...")
+        init_predefined_programs()
+        logger.info("Program initialization completed")
+    except Exception as e:
+        logger.error(f"Error initializing programs: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
     
     # Route based on authentication status
     if st.session_state.user_id is None:

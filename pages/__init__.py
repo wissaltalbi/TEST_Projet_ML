@@ -12,4 +12,5 @@ __all__ = [
     'programs_page',
     'achievements_page',
     'history_page',
+    'simulation_page',
 ]
